@@ -9,6 +9,8 @@ class CovieStatusRepository {
       baseUrl: "http://openapi.data.go.kr",
       queryParameters: {
         "ServiceKey": apiKey,
+        "startCreateDt": "20220102",
+        "endCreateDt": "20220103"
       },
     ),
   );
