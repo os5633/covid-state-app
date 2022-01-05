@@ -1,6 +1,8 @@
+import 'package:covid_state_app/src/controller/covid_status_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class CovidAppHome extends StatelessWidget {
+class CovidAppHome extends GetView<CovieStatusController> {
   const CovidAppHome({Key? key}) : super(key: key);
 
   @override

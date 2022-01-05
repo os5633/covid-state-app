@@ -9,8 +9,6 @@ class CovieStatusRepository {
       baseUrl: "http://openapi.data.go.kr",
       queryParameters: {
         "ServiceKey": apiKey,
-        "startCreateDt": "20220102",
-        "endCreateDt": "20220103"
       },
     ),
   );
@@ -23,8 +21,8 @@ class CovieStatusRepository {
 
     if (results.isNotEmpty) {
       return Covid19StatisticsModel.fromXml(results.first);
-    } else {
-      return Future.error(results);
     }
+
+    return Future.error(results.toString());
   }
 }

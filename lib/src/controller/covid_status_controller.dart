@@ -9,7 +9,6 @@ class CovieStatusController extends GetxController {
   @override
   void onInit() {
     fetchCovidStatus();
-    print(covidStatus);
     super.onInit();
   }
 

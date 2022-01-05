@@ -23,7 +23,7 @@ class Covid19StatisticsModel {
 
   factory Covid19StatisticsModel.fromXml(XmlElement xml) {
     return Covid19StatisticsModel(
-      accExamCnt: XmlUtils.searchResult(xml, 'accDefRate'),
+      accExamCnt: XmlUtils.searchResult(xml, 'accExamCnt'),
       createDt: XmlUtils.searchResult(xml, 'createDt'),
       deathCnt: XmlUtils.searchResult(xml, 'deathCnt'),
       decideCnt: XmlUtils.searchResult(xml, 'decideCnt'),
