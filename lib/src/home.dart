@@ -1,13 +1,12 @@
-import 'package:covid_state_app/src/canvas/arrow_clip_path.dart';
 import 'package:covid_state_app/src/controller/covid_status_controller.dart';
+import 'package:covid_state_app/src/widget/bar_chart.dart';
 import 'package:covid_state_app/src/widget/covid_status_viewer.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CovidAppHome extends GetView<CovieStatusController> {
-  const CovidAppHome({Key? key}) : super(key: key);
-
+  CovidAppHome({Key? key}) : super(key: key);
+  double headerTopZone = 0;
   List<Widget> _background(hedaerTopZone) => [
         Container(
           decoration: BoxDecoration(
@@ -38,10 +37,12 @@ class CovidAppHome extends GetView<CovieStatusController> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16), color: Colors.red),
-              child: const Text(
-                "08.24 00:00 기준",
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              child: Obx(
+                () => Text(
+                  controller.standardDayString,
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ),
@@ -49,23 +50,23 @@ class CovidAppHome extends GetView<CovieStatusController> {
         Positioned(
           top: hedaerTopZone + 60,
           right: 40,
-          child: const CovidStatusViewer(
-            title: "확진자",
-            titleColor: Colors.white,
-            addedCount: 1629,
-            totalCount: 187362,
-            upDwon: ArrowDirection.up,
-            vlaueColor: Colors.white,
-            spacing: 0,
-            dense: false,
-          ),
+          child: Obx(() => CovidStatusViewer(
+                title: "확진자",
+                titleColor: Colors.white,
+                addedCount: controller.todayDate.calcDecideCnt,
+                totalCount: controller.todayDate.decideCnt ?? 0,
+                upDown: controller
+                    .calculrateUpDown(controller.todayDate.calcDecideCnt),
+                vlaueColor: Colors.white,
+                spacing: 0,
+                dense: false,
+              )),
         )
       ];
 
   @override
   Widget build(BuildContext context) {
-    double hedaerTopZone =
-        Get.mediaQuery.padding.top + AppBar().preferredSize.height;
+    headerTopZone = Get.mediaQuery.padding.top + AppBar().preferredSize.height;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -89,9 +90,9 @@ class CovidAppHome extends GetView<CovieStatusController> {
       ),
       body: Stack(
         children: [
-          ..._background(hedaerTopZone),
+          ..._background(headerTopZone),
           Positioned(
-            top: hedaerTopZone + 200,
+            top: headerTopZone + 200,
             left: 0,
             right: 0,
             bottom: 0,
@@ -106,19 +107,26 @@ class CovidAppHome extends GetView<CovieStatusController> {
                   children: [
                     _todaySatus(),
                     const SizedBox(
-                      height: 20,
+                      height: 30,
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: const [
-                        Text(
+                      children: [
+                        const Text(
                           "확진자 추이",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
                           ),
                         ),
-                        BarChartSample3()
+                        Obx(
+                          () => controller.weekDatas.isEmpty
+                              ? Container()
+                              : CovidBarChart(
+                                  covidDatas: controller.weekDatas,
+                                  maxY: controller.maxDecideValue,
+                                ),
+                        )
                       ],
                     )
                   ],
@@ -134,12 +142,15 @@ class CovidAppHome extends GetView<CovieStatusController> {
   Row _todaySatus() {
     return Row(
       children: [
-        const Expanded(
-          child: CovidStatusViewer(
-            title: "검사 수",
-            addedCount: 1629,
-            totalCount: 187362,
-            upDwon: ArrowDirection.down,
+        Expanded(
+          child: Obx(
+            () => CovidStatusViewer(
+              title: "검사 수",
+              addedCount: controller.todayDate.clacAccExamCnt,
+              totalCount: controller.todayDate.accExamCnt ?? 0,
+              upDown: controller
+                  .calculrateUpDown(controller.todayDate.clacAccExamCnt),
+            ),
           ),
         ),
         Container(
@@ -147,168 +158,17 @@ class CovidAppHome extends GetView<CovieStatusController> {
           width: 1,
           color: Colors.grey[200],
         ),
-        const Expanded(
-          child: CovidStatusViewer(
+        Expanded(
+            child: Obx(
+          () => CovidStatusViewer(
             title: "사망자",
-            addedCount: 1629,
-            totalCount: 187362,
-            upDwon: ArrowDirection.up,
+            addedCount: controller.todayDate.calcDeathCnt,
+            totalCount: controller.todayDate.deathCnt ?? 0,
+            upDown:
+                controller.calculrateUpDown(controller.todayDate.calcDeathCnt),
           ),
-        ),
+        )),
       ],
-    );
-  }
-}
-
-class Chart extends StatelessWidget {
-  const Chart({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return BarChart(
-      BarChartData(
-          barTouchData: barTouchData,
-          titlesData: titlesData,
-          borderData: borderData,
-          barGroups: barGroups,
-          alignment: BarChartAlignment.spaceAround,
-          maxY: 20,
-          gridData: FlGridData(show: false)),
-    );
-  }
-
-  BarTouchData get barTouchData => BarTouchData(
-        enabled: false,
-        touchTooltipData: BarTouchTooltipData(
-          tooltipBgColor: Colors.transparent,
-          tooltipPadding: const EdgeInsets.all(0),
-          tooltipMargin: 8,
-          getTooltipItem: (
-            BarChartGroupData group,
-            int groupIndex,
-            BarChartRodData rod,
-            int rodIndex,
-          ) {
-            return BarTooltipItem(
-              rod.y.round().toString(),
-              TextStyle(
-                color: Colors.black.withOpacity(0.7),
-                fontWeight: FontWeight.bold,
-              ),
-            );
-          },
-        ),
-      );
-
-  FlTitlesData get titlesData => FlTitlesData(
-        show: true,
-        bottomTitles: SideTitles(
-          showTitles: true,
-          getTextStyles: (context, value) => const TextStyle(
-            color: Color(0xff7589a2),
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
-          margin: 20,
-          getTitles: (double value) {
-            switch (value.toInt()) {
-              case 0:
-                return 'Mn';
-              case 1:
-                return 'Te';
-              case 2:
-                return 'Wd';
-              case 3:
-                return 'Tu';
-              case 4:
-                return 'Fr';
-              case 5:
-                return 'St';
-              case 6:
-                return 'Sn';
-              default:
-                return '';
-            }
-          },
-        ),
-        leftTitles: SideTitles(showTitles: false),
-        topTitles: SideTitles(showTitles: false),
-        rightTitles: SideTitles(showTitles: false),
-      );
-
-  FlBorderData get borderData => FlBorderData(
-        show: false,
-      );
-
-  List<BarChartGroupData> get barGroups => [
-        BarChartGroupData(
-          x: 0,
-          barRods: [
-            BarChartRodData(
-                y: 8, colors: [Colors.lightBlueAccent, Colors.greenAccent])
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 1,
-          barRods: [
-            BarChartRodData(
-                y: 10, colors: [Colors.lightBlueAccent, Colors.greenAccent])
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 2,
-          barRods: [
-            BarChartRodData(
-                y: 14, colors: [Colors.lightBlueAccent, Colors.greenAccent])
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 3,
-          barRods: [
-            BarChartRodData(
-                y: 15, colors: [Colors.lightBlueAccent, Colors.greenAccent])
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 3,
-          barRods: [
-            BarChartRodData(
-                y: 13, colors: [Colors.lightBlueAccent, Colors.greenAccent])
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 3,
-          barRods: [
-            BarChartRodData(
-                y: 10, colors: [Colors.lightBlueAccent, Colors.greenAccent])
-          ],
-          showingTooltipIndicators: [0],
-        ),
-      ];
-}
-
-class BarChartSample3 extends StatefulWidget {
-  const BarChartSample3({Key? key}) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => BarChartSample3State();
-}
-
-class BarChartSample3State extends State<BarChartSample3> {
-  @override
-  Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1.3,
-      child: Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        child: const Chart(),
-      ),
     );
   }
 }

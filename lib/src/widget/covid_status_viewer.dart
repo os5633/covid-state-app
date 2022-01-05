@@ -7,7 +7,7 @@ class CovidStatusViewer extends StatelessWidget {
     Key? key,
     required this.title,
     required this.addedCount,
-    required this.upDwon,
+    required this.upDown,
     required this.totalCount,
     this.dense = true,
     this.titleColor = const Color(0xff4c4e5d),
@@ -17,7 +17,7 @@ class CovidStatusViewer extends StatelessWidget {
 
   final String title;
   final double addedCount;
-  final ArrowDirection upDwon;
+  final ArrowDirection upDown;
   final double totalCount;
   final bool dense;
   final Color titleColor;
@@ -27,7 +27,7 @@ class CovidStatusViewer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color upDownColor = Colors.black;
-    switch (upDwon) {
+    switch (upDown) {
       case ArrowDirection.up:
         upDownColor = const Color(0xffff1c03);
         break;
@@ -51,7 +51,7 @@ class CovidStatusViewer extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ClipPath(
-              clipper: ArrowClipPath(direction: upDwon),
+              clipper: ArrowClipPath(direction: upDown),
               child: Container(
                 width: dense ? 10 : 20,
                 height: dense ? 10 : 20,
@@ -69,6 +69,9 @@ class CovidStatusViewer extends StatelessWidget {
                   fontWeight: FontWeight.bold),
             ),
           ],
+        ),
+        const SizedBox(
+          height: 5,
         ),
         Text(
           DataUtils.numberFormat(totalCount),
