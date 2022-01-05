@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      home: const CovidAppHome(),
+      home: CovidAppHome(),
       initialBinding: BindingsBuilder(() {
         Get.put(CovieStatusController());
       }),

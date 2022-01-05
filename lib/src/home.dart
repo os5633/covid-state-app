@@ -68,7 +68,10 @@ class CovidAppHome extends GetView<CovieStatusController> {
   Widget build(BuildContext context) {
     headerTopZone = Get.mediaQuery.padding.top + AppBar().preferredSize.height;
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
         title: const Text("코로나 일별 현황"),
         centerTitle: true,
         leading: IconButton(
