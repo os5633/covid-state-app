@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 class CovieStatusController extends GetxController {
   final CovieStatusRepository _covieStatusRepository = CovieStatusRepository();
-  Rx<Covid19StatisticsModel> covidStatus = Covid19StatisticsModel().obs;
+  Rx<CovidStatusModel> covidStatus = CovidStatusModel().obs;
 
   @override
   void onInit() {
@@ -14,6 +14,9 @@ class CovieStatusController extends GetxController {
 
   void fetchCovidStatus() async {
     var result = await _covieStatusRepository.fetchCovidStatus();
-    covidStatus(result);
+
+    if (result != null) {
+      covidStatus(result);
+    }
   }
 }

@@ -11,6 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       home: const CovidAppHome(),
       initialBinding: BindingsBuilder(() {
         Get.put(CovieStatusController());
