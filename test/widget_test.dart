@@ -41,9 +41,9 @@ void main() {
   test('코로나 전체 통계', () {
     final document = XmlDocument.parse(bookshelfXml);
     final items = document.findAllElements('item');
-    var covid19Statics = <Covid19StatisticsModel>[];
+    var covid19Statics = <CovidStatusModel>[];
     for (var node in items) {
-      covid19Statics.add(Covid19StatisticsModel.fromXml(node));
+      covid19Statics.add(CovidStatusModel.fromXml(node));
     }
     for (var covid19 in covid19Statics) {
       print('${covid19.stateDt} : ${covid19.decideCnt}');
@@ -51,7 +51,7 @@ void main() {
   });
 }
 
-class Covid19StatisticsModel {
+class CovidStatusModel {
   String? accExamCnt;
   String? createDt;
   String? deathCnt;
@@ -60,7 +60,7 @@ class Covid19StatisticsModel {
   String? stateDt;
   String? stateTime;
   String? updateDt;
-  Covid19StatisticsModel({
+  CovidStatusModel({
     this.accExamCnt,
     this.createDt,
     this.deathCnt,
@@ -71,8 +71,8 @@ class Covid19StatisticsModel {
     this.updateDt,
   });
 
-  factory Covid19StatisticsModel.fromXml(XmlElement xml) {
-    return Covid19StatisticsModel(
+  factory CovidStatusModel.fromXml(XmlElement xml) {
+    return CovidStatusModel(
       accExamCnt: XmlUtils.searchResult(xml, 'accDefRate'),
       createDt: XmlUtils.searchResult(xml, 'createDt'),
       deathCnt: XmlUtils.searchResult(xml, 'deathCnt'),
