@@ -1,16 +1,19 @@
 import 'package:covid_state_app/src/utils/xml_utils.dart';
 import 'package:xml/xml.dart';
 
-class Covid19StatisticsModel {
-  String? accExamCnt;
+class CovidStatusModel {
+  double? accExamCnt;
+  double? deathCnt;
+  double? decideCnt;
+  double clacAccExamCnt = 0;
+  double calcDeathCnt = 0;
+  double calcDecideCnt = 0;
+  double? seq;
+  DateTime? stateDt;
   String? createDt;
-  String? deathCnt;
-  String? decideCnt;
-  String? seq;
-  String? stateDt;
   String? stateTime;
   String? updateDt;
-  Covid19StatisticsModel({
+  CovidStatusModel({
     this.accExamCnt,
     this.createDt,
     this.deathCnt,
@@ -21,16 +24,39 @@ class Covid19StatisticsModel {
     this.updateDt,
   });
 
-  factory Covid19StatisticsModel.fromXml(XmlElement xml) {
-    return Covid19StatisticsModel(
-      accExamCnt: XmlUtils.searchResult(xml, 'accExamCnt'),
-      createDt: XmlUtils.searchResult(xml, 'createDt'),
-      deathCnt: XmlUtils.searchResult(xml, 'deathCnt'),
-      decideCnt: XmlUtils.searchResult(xml, 'decideCnt'),
-      seq: XmlUtils.searchResult(xml, 'seq'),
-      stateDt: XmlUtils.searchResult(xml, 'stateDt'),
-      stateTime: XmlUtils.searchResult(xml, 'stateTime'),
-      updateDt: XmlUtils.searchResult(xml, 'updateDt'),
+  factory CovidStatusModel.empty() {
+    return CovidStatusModel();
+  }
+
+  factory CovidStatusModel.fromXml(XmlElement xml) {
+    return CovidStatusModel(
+      accExamCnt: XmlUtils.searchResultForDouble(xml, 'accExamCnt'),
+      createDt: XmlUtils.searchResultForString(xml, 'createDt'),
+      deathCnt: XmlUtils.searchResultForDouble(xml, 'deathCnt'),
+      decideCnt: XmlUtils.searchResultForDouble(xml, 'decideCnt'),
+      seq: XmlUtils.searchResultForDouble(xml, 'seq'),
+      stateDt: XmlUtils.searchResultForString(xml, 'stateDt') != ''
+          ? DateTime.parse(XmlUtils.searchResultForString(xml, 'stateDt'))
+          : null,
+      stateTime: XmlUtils.searchResultForString(xml, 'stateTime'),
+      updateDt: XmlUtils.searchResultForString(xml, 'updateDt'),
     );
+  }
+  void updateCalcAboutYesterday(CovidStatusModel yesterDayData) {
+    _updateCalcDecideCnt(yesterDayData.decideCnt!);
+    _updateCalcDeathCnt(yesterDayData.deathCnt!);
+    _updateClacAccExamCnt(yesterDayData.accExamCnt!);
+  }
+
+  void _updateCalcDecideCnt(double beforeCnt) {
+    calcDecideCnt = decideCnt! - beforeCnt;
+  }
+
+  void _updateClacAccExamCnt(double beforeCnt) {
+    clacAccExamCnt = accExamCnt! - beforeCnt;
+  }
+
+  void _updateCalcDeathCnt(double beforeCnt) {
+    calcDeathCnt = deathCnt! - beforeCnt;
   }
 }

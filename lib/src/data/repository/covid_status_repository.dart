@@ -4,25 +4,26 @@ import 'package:dio/dio.dart';
 import 'package:xml/xml.dart';
 
 class CovieStatusRepository {
-  final _dio = Dio(
+  final Dio _dio = Dio(
     BaseOptions(
       baseUrl: "http://openapi.data.go.kr",
-      queryParameters: {
-        "ServiceKey": apiKey,
-      },
+      queryParameters: {'ServiceKey': apiKey},
     ),
   );
 
-  Future<Covid19StatisticsModel> fetchCovidStatus() async {
-    dynamic response =
-        await _dio.get('/openapi/service/rest/Covid19/getCovid19InfStateJson');
+  Future<List<CovidStatusModel>> fetchCovidStatus(
+      {String? startDate, String? endDate}) async {
+    Map<String, String> query = <String, String>{};
+    if (startDate != null) query.putIfAbsent('startCreateDt', () => startDate);
+    if (endDate != null) query.putIfAbsent('endCreateDt', () => endDate);
+    dynamic response = await _dio.get(
+        '/openapi/service/rest/Covid19/getCovid19InfStateJson',
+        queryParameters: query);
     final document = XmlDocument.parse(response.data);
     final results = document.findAllElements('item');
 
-    if (results.isNotEmpty) {
-      return Covid19StatisticsModel.fromXml(results.first);
-    }
-
-    return Future.error(results.toString());
+    return results
+        .map<CovidStatusModel>((element) => CovidStatusModel.fromXml(element))
+        .toList();
   }
 }
